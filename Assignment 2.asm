@@ -83,13 +83,13 @@ main PROC
 
 ; 4. Get the upper_bound from the user 
 	get_upper_bound:
-		mov		edx, OFFSET val_range_1
+		mov	edx, OFFSET val_range_1
 		call	WriteString
 		call	Crlf
-		mov		edx, OFFSET prompt_3
+		mov	edx, OFFSET prompt_3
 		call	WriteString
 		call	ReadInt			; user input will be stored in eax 
-		mov		upper_bound, eax
+		mov	upper_bound, eax
 		call	Crlf
 
 		; Check if the length is between 1 and 1000
