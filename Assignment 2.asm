@@ -16,13 +16,16 @@ INCLUDE Irvine32.inc
 	extra_cred	BYTE		"------I completed the extra credit option------", 0
 
 	upper_bound	DWORD		? 
-	lower_bound DWORD		?
+	lower_bound 	DWORD		?
 	again 		DWORD		?
+	outer_loop_count DWORD	10
 
 	good_bye	BYTE		"Good Bye ", 0
-	username	BYTE		33 DUP(0)		;string enter by the user, initialized to 0
-	prime_msg	BYTE		" ** Prime Number **", 0
-	factor_space BYTE ", ", 0 ; Separator between factors
+	username	BYTE		33 DUP(0)
+	primeMsg	BYTE		" ** Prime Number **", 0
+	factorsMsg  	BYTE		"Factors of: ", 0
+	spaceChar	BYTE		", ", 0 
+	err1		BYTE		"The upperbound must be > than the lowerbound.", 0
 
 
 
@@ -38,23 +41,23 @@ INCLUDE Irvine32.inc
 main PROC
 
 ; 1. Introduce the programmer
-	mov		edx, OFFSET intro
+	mov	edx, OFFSET intro
 	call	WriteString
 	call	Crlf
 	call	Crlf
 
 ; I COMPLETED THE EXTRA CREDIT OPTION
-	mov		edx, OFFSET extra_cred
+	mov	edx, OFFSET extra_cred
 	call	WriteString
 	call	Crlf
 	call	Crlf
 	 
 
 ; 2. Get the name from the user 
-	mov		edx, OFFSET prompt_1
+	mov	edx, OFFSET prompt_1
 	call	WriteString
-	mov		edx, OFFSET username
-	mov		ecx, 32
+	mov	edx, OFFSET username
+	mov	ecx, 32
 	call	ReadString
 	call	crlf
       
@@ -95,6 +98,18 @@ main PROC
 		cmp     eax, 1000
 		jg      get_upper_bound         ; if greater than 1000, get length again
 
+		; check if uppbound is greater than lower bound
+		mov		eax, upper_bound 
+		cmp		eax, lower_bound
+		jg		valid_upper_bound ; if upper_bound > lower_bound, is valid, continue
+
+		; If we get here, upper_bound is less than lower_bound. Display an error message.
+		mov	edx, OFFSET err1 
+		call	WriteString 
+		call	Crlf 
+		jmp	get_upper_bound
+
+	valid_upper_bound:
 
 ; 12. Play again logic
    mov edx, OFFSET prompt_5
@@ -105,7 +120,9 @@ main PROC
    cmp again, 1
    je calculate_again 
    call Crlf
+   jmp all_done
 
+ all_done:
 ; 13. Farewell "Goodbye" 
     mov     edx, OFFSET good_bye
     call    WriteString
