@@ -67,7 +67,7 @@ main PROC
     call WriteString
     call Crlf
 
-    ; 2. Get the name from the user 
+    ; Get the name from the user 
     mov edx, OFFSET prompt_1
     call WriteString
     mov edx, OFFSET username
@@ -78,7 +78,7 @@ main PROC
     ; Start of the loop
 calculate_again:
 
-    ; 3. Get the lower_bound from the user
+    ; Get the lower_bound from the user
 get_lower_bound:
     mov edx, OFFSET val_range_1
     call WriteString
@@ -94,7 +94,8 @@ get_lower_bound:
     cmp eax, 1000
     jg  get_lower_bound
 
-    ; 4. Get the upper_bound from the user 
+
+    ; Get the upper_bound from the user 
 get_upper_bound:
     mov edx, OFFSET val_range_1
     call WriteString
@@ -163,16 +164,15 @@ not_a_factor:
     jmp inner_loop        ; Jump to the next iteration
 
 check_prime:
-    cmp ecx, 2            ; Prime numbers have exactly two factors
+    cmp ecx, 2            ; Prime numbers only have two factors; only itself and 1
     jne  print_end        ; If not 2, it's not a prime
-    mov edx, OFFSET primeMsg
+    mov edx, OFFSET primeMsg ; If 2, print prime message
     call WriteString
 
 print_end:
-    call Crlf             ; New line for the next number
-    inc esi               ; Next number in the range
+    call Crlf             ; New line
+    inc esi               ; Iterate Next number in the outer loop
     jmp outer_loop
-
 
 all_done:
     ; 12. Play again logic
