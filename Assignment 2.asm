@@ -7,131 +7,191 @@ TITLE Factors (a1.asm)
 ; Assignment Number: 2                 Due Date: 2/1/2024
 ; Description: This programs displays the factors of numbers from a lowerbound to upperbound
 
+ COMMENT @
+
+ ; I wrote this program in higher level C++ to understand the logic and then converted it to assembly language
+  for (int i = lower; i <= upper; ++i) {
+    cout << "Factors of " << i << ": ";
+    int factorCount = 0;
+    // check factors up to and including i
+    for (int j = 1; j <= i; ++j) {
+      if (i % j == 0) {
+        cout << j << " ";
+        ++factorCount;
+      }
+    }
+    if (factorCount == 2)
+      cout << "is a prime number";
+
+    cout << endl;
+  }
+ @
+
 INCLUDE Irvine32.inc
 
 .data
 
 ; Variable declarations
-	intro		BYTE		"The program calculates and displays the factors of numbers from lowerbound to upperbound", 0
-	extra_cred	BYTE		"------I completed the extra credit option------", 0
+intro           BYTE    "The program calculates and displays the factors of numbers from lowerbound to upperbound", 0dh, 0ah, 0
+extra_cred      BYTE    "------I completed the extra credit option------", 0dh, 0ah, 0
 
-	upper_bound	DWORD		? 
-	lower_bound 	DWORD		?
-	again 		DWORD		?
-	outer_loop_count DWORD	10
+upper_bound     DWORD   ? 
+lower_bound     DWORD   ?
+again           DWORD   ?
 
-	good_bye	BYTE		"Good Bye ", 0
-	username	BYTE		33 DUP(0)
-	primeMsg	BYTE		" ** Prime Number **", 0
-	factorsMsg  	BYTE		"Factors of: ", 0
-	spaceChar	BYTE		", ", 0 
-	err1		BYTE		"The upperbound must be > than the lowerbound.", 0
+good_bye        BYTE    "Good Bye ", 0
+format          BYTE    " : ", 0
+username        BYTE    33 DUP(0)
+primeMsg        BYTE    " ** Prime Number **", 0dh, 0ah, 0
+factorsMsg      BYTE    "Factors of ", 0
+spaceChar       BYTE    " ", 0
+err1            BYTE    "The upperbound must be greater than the lowerbound.", 0dh, 0ah, 0
 
+prompt_1        BYTE    "Enter your name: ", 0
+prompt_2        BYTE    "Enter the lowerbound of the range: ", 0
+prompt_3        BYTE    "Enter the upperbound of the range: ", 0
+prompt_5        BYTE    "Would you like to calculate again? (0=NO 1=YES): ", 0
 
-
-	prompt_1	BYTE		"Enter your name: ", 0
-	prompt_2	BYTE		"Enter the lowerbound of the range: ", 0
-	prompt_3	BYTE		"Enter the upperbound of the range: ", 0
-	prompt_5	BYTE		"Would you like to calculate again? (0=NO 1=YES):", 0
-
-	val_range_1	BYTE		"Please enter a number between 1 and 1000", 0
-
+val_range_1     BYTE    "Please enter a number between 1 and 1000", 0dh, 0ah, 0
 
 .code
 main PROC
 
-; 1. Introduce the programmer
-	mov	edx, OFFSET intro
-	call	WriteString
-	call	Crlf
-	call	Crlf
+    ; 1. Introduce the program
+    mov edx, OFFSET intro
+    call WriteString
+    call Crlf
 
-; I COMPLETED THE EXTRA CREDIT OPTION
-	mov	edx, OFFSET extra_cred
-	call	WriteString
-	call	Crlf
-	call	Crlf
-	 
+    ; I COMPLETED THE EXTRA CREDIT OPTION
+    mov edx, OFFSET extra_cred
+    call WriteString
+    call Crlf
 
-; 2. Get the name from the user 
-	mov	edx, OFFSET prompt_1
-	call	WriteString
-	mov	edx, OFFSET username
-	mov	ecx, 32
-	call	ReadString
-	call	crlf
-      
-; Start of the loop
-	calculate_again:
-	
-; 3. Get the lower_bound from the user
-	get_lower_bound:
-		mov		edx, OFFSET val_range_1
-		call	WriteString
-		call	Crlf
-		mov		edx, OFFSET prompt_2
-		call	WriteString
-		call	ReadInt			;	user input will be stored in eax 
-		mov		lower_bound, eax
-		call	Crlf
-		
-		; Check if the width is between 1 and 1000
-		cmp     eax, 1
-		jl      get_lower_bound          ; if less than 1, get width again
-		cmp     eax, 1000
-		jg      get_lower_bound          ; if greater than 1000, get width again
+    ; 2. Get the name from the user 
+    mov edx, OFFSET prompt_1
+    call WriteString
+    mov edx, OFFSET username
+    mov ecx, SIZEOF username
+    call ReadString
+    call Crlf
 
-; 4. Get the upper_bound from the user 
-	get_upper_bound:
-		mov	edx, OFFSET val_range_1
-		call	WriteString
-		call	Crlf
-		mov	edx, OFFSET prompt_3
-		call	WriteString
-		call	ReadInt			; user input will be stored in eax 
-		mov	upper_bound, eax
-		call	Crlf
+    ; Start of the loop
+calculate_again:
 
-		; Check if the length is between 1 and 1000
-		cmp     eax, 1
-		jl      get_upper_bound         ; if less than 1, get length again
-		cmp     eax, 1000
-		jg      get_upper_bound         ; if greater than 1000, get length again
+    ; 3. Get the lower_bound from the user
+get_lower_bound:
+    mov edx, OFFSET val_range_1
+    call WriteString
+    mov edx, OFFSET prompt_2
+    call WriteString
+    call ReadInt
+    mov lower_bound, eax
+    call Crlf
 
-		; check if uppbound is greater than lower bound
-		mov		eax, upper_bound 
-		cmp		eax, lower_bound
-		jg		valid_upper_bound ; if upper_bound > lower_bound, is valid, continue
+    ; Check if the width is between 1 and 1000
+    cmp eax, 1
+    jl  get_lower_bound
+    cmp eax, 1000
+    jg  get_lower_bound
 
-		; If we get here, upper_bound is less than lower_bound. Display an error message.
-		mov	edx, OFFSET err1 
-		call	WriteString 
-		call	Crlf 
-		jmp	get_upper_bound
+    ; 4. Get the upper_bound from the user 
+get_upper_bound:
+    mov edx, OFFSET val_range_1
+    call WriteString
+    mov edx, OFFSET prompt_3
+    call WriteString
+    call ReadInt
+    mov upper_bound, eax
+    call Crlf
 
-	valid_upper_bound:
+    ; Check if the length is between 1 and 1000
+    cmp eax, 1
+    jl  get_upper_bound
+    cmp eax, 1000
+    jg  get_upper_bound
 
-; 12. Play again logic
-   mov edx, OFFSET prompt_5
-   call WriteString
-   call Readint
-   mov again, eax
 
-   cmp again, 1
-   je calculate_again 
-   call Crlf
-   jmp all_done
+    ; Check if upper_bound is greater than lower_bound
+    mov eax, upper_bound
+    cmp eax, lower_bound
+    jg  valid_upper_bound
 
- all_done:
-; 13. Farewell "Goodbye" 
-    mov     edx, OFFSET good_bye
-    call    WriteString
-    mov     edx, OFFSET username
-    call    WriteString
-    call    Crlf
+    ; Display error message if upper_bound is less than lower_bound
+    mov edx, OFFSET err1
+    call WriteString
+    jmp get_upper_bound
 
-    exit    ; exit to operating system
+    valid_upper_bound:
+    mov esi, lower_bound  ; Starting index for the outer loop
+
+outer_loop:
+    ; Counter for the outer loop; if the number is greater than the upper_bound, exit the loop
+    cmp esi, upper_bound  
+    jg  all_done          
+
+    ; Print current number
+    mov edx, OFFSET factorsMsg
+    call WriteString
+    mov eax, esi
+    call WriteDec
+    mov edx, OFFSET format
+    call WriteString
+
+    mov ecx, 0            ; Factor counter 
+    mov ebx, 1            ; Inner loop iterator, starting from 1
+
+inner_loop:
+    cmp ebx, esi          ; Check up to the number itself
+    jg  check_prime       ; If ebx > esi, i.e. all factors have been checked, check for primes
+
+    ; Check if ebx is a factor of esi
+    mov eax, esi
+    cdq                   ; Clear EDX for division
+    div ebx               ; Divide esi by ebx
+    cmp edx, 0            ; Check remainder
+    jnz  not_a_factor     ; If remainder != 0, ebx is not a factor
+
+    ; Factor found, print and count it
+    mov eax, ebx
+    call WriteDec
+    mov edx, OFFSET spaceChar
+    call WriteString
+    inc ecx               ; Increase factor count
+
+not_a_factor:
+    inc ebx               ; Increment innner loop iterator
+    jmp inner_loop        ; Jump to the next iteration
+
+check_prime:
+    cmp ecx, 2            ; Prime numbers have exactly two factors
+    jne  print_end        ; If not 2, it's not a prime
+    mov edx, OFFSET primeMsg
+    call WriteString
+
+print_end:
+    call Crlf             ; New line for the next number
+    inc esi               ; Next number in the range
+    jmp outer_loop
+
+
+all_done:
+    ; 12. Play again logic
+    mov edx, OFFSET prompt_5
+    call WriteString
+    call ReadInt
+    mov again, eax
+    cmp again, 1
+    je  calculate_again
+    jmp farewell
+
+farewell:
+    ; 13. Farewell "Goodbye"
+    mov edx, OFFSET good_bye
+    call WriteString
+    mov edx, OFFSET username
+    call WriteString
+    call Crlf
+    exit
 
 main ENDP
-
 END main
